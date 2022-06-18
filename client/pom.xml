@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.kmarinos.hermes</groupId>
+		<artifactId>email</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>email-client</artifactId>
+	<name>email-client</name>
+	<properties>
+		<apache-httpClient>4.5.13</apache-httpClient>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.kmarinos.hermes</groupId>
+			<artifactId>email-domain</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>${apache-httpClient}</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpmime</artifactId>
+    <version>${apache-httpClient}</version>
+</dependency>
+
+	</dependencies>
+</project>
