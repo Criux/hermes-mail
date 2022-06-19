@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EmailContext implements Serializable {
-private EMailRecipient recipient;
+private EmailRecipient recipient;
 private List<String> attachmentFilenames;
 }
