@@ -14,7 +14,7 @@ public class SerializableClass implements Serializable {
 
   public SerializableClass(Class<?> clazz){
     this.setName(clazz.getName());
-    InputStream is = clazz.getClassLoader().getResourceAsStream(this.getName().replace(".","/")+"-class");
+    InputStream is = clazz.getClassLoader().getResourceAsStream(this.getName().replace(".","/")+".class");
     try{
       setData(fromInputStream(is));
     }catch(IOException e){

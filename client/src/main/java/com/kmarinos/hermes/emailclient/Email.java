@@ -1,5 +1,10 @@
-package com.kmarinos.hermes.domain.email;
+package com.kmarinos.hermes.emailclient;
 
+import com.kmarinos.hermes.domain.email.Body;
+import com.kmarinos.hermes.domain.email.ConditionalText;
+import com.kmarinos.hermes.domain.email.EmailAttachment;
+import com.kmarinos.hermes.domain.email.EmailRecipient;
+import com.kmarinos.hermes.domain.email.SerializableFunction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,4 +34,11 @@ public class Email implements Serializable {
 
   public Email() {}
 
+  public static EmailCompositionWorkflow compose(){return new EmailCompositionWorkflow();}
+  public static EmailCompositionWorkflow compose(String template){
+    return new EmailCompositionWorkflow().template(template);
+  }
+  public static EmailCompositionWorkflow fromTemplate(com.kmarinos.hermes.domain.email.Email email){
+    return new EmailCompositionWorkflow(email);
+  }
 }

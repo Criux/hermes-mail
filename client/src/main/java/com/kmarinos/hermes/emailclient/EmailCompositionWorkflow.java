@@ -1,6 +1,20 @@
-package com.kmarinos.hermes.domain.email;
+package com.kmarinos.hermes.emailclient;
 
+import com.kmarinos.hermes.domain.EmailUtils;
+import com.kmarinos.hermes.domain.IdentityProvider;
 import com.kmarinos.hermes.domain.SerializableLambdaUtils;
+import com.kmarinos.hermes.domain.email.Body;
+import com.kmarinos.hermes.domain.email.ConditionalText;
+import com.kmarinos.hermes.domain.email.Email;
+import com.kmarinos.hermes.domain.email.EmailAttachment;
+import com.kmarinos.hermes.domain.email.EmailRecipient;
+import com.kmarinos.hermes.domain.email.Excel;
+import com.kmarinos.hermes.domain.email.SerializableClass;
+import com.kmarinos.hermes.domain.email.SerializableFunction;
+import com.kmarinos.hermes.domain.email.SerializablePredicate;
+import com.kmarinos.hermes.domain.email.Sheet;
+import com.kmarinos.hermes.domain.email.Table;
+import com.kmarinos.hermes.domain.email.TablesAttachment;
 import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -21,7 +35,7 @@ import lombok.Setter;
 @Setter
 public class EmailCompositionWorkflow {
   List<String> toEmails = new ArrayList<>();
-  Map<String,SerializableFunction> params = new HashMap<>();
+  Map<String, SerializableFunction> params = new HashMap<>();
   Map<String,List<ConditionalText>> conditionalTexts = new HashMap<>();
   List<EmailAttachment> attachments = new ArrayList<>();
   boolean allowDefaults = true;
@@ -31,9 +45,14 @@ public class EmailCompositionWorkflow {
   String template;
   Map<String,byte[]> classesToLoad = new HashMap<>();
 
-  public EmailCompositionWorkflow(){}
+  IdentityProvider identityProvider;
+
+  public EmailCompositionWorkflow(){
+    identityProvider = new StandardIdentityProvider();
+  }
 
   public EmailCompositionWorkflow(Email template){
+    this();
     if(template.getToRecipients()!=null){
       this.setToEmails(template.getToRecipients().stream().map(EmailRecipient::getEmail).toList());
     }
@@ -45,6 +64,7 @@ public class EmailCompositionWorkflow {
     this.setBody(template.getBody());
     this.setAllowDefaults(template.isAllowDefaults());
     this.setAttachments(template.getAttachments());
+
   }
   public <T> T copyNonNullProperties(T target,T in){
     if(in == null || target == null || target.getClass() != in.getClass()){
@@ -73,7 +93,7 @@ public class EmailCompositionWorkflow {
   }
   public Email get(){
     Email email = new Email();
-    email.setToRecipients(this.toEmails.stream().map(IdentityProvider.getInstance()::getRecipientInfo).toList());
+    email.setToRecipients(this.toEmails.stream().map(identityProvider::getRecipientInfo).toList());
     email.setParams(params);
     email.setClassesToLoad(classesToLoad);
     email.setConditionalTexts(conditionalTexts);
@@ -166,7 +186,7 @@ public class EmailCompositionWorkflow {
     params.put(name,mailCtx);
     return this;
   }
-  public EmailCompositionWorkflow conditionalParam(String name,SerializablePredicate condition, String valueTrue){
+  public EmailCompositionWorkflow conditionalParam(String name, SerializablePredicate condition, String valueTrue){
     return this.conditionalParam(name,condition,ctx->valueTrue,null);
   }
 
