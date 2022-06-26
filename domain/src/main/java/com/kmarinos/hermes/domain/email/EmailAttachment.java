@@ -42,7 +42,7 @@ public class EmailAttachment implements Serializable {
     return recalculateName();
   }
   private String recalculateName(){
-    String adjustedName=this.getName();
+    String adjustedName=this.name;
     //set default file name if it is not already set
     if(adjustedName == null || adjustedName.trim().isEmpty()){
       adjustedName = EmailAttachment.REPORT_DEFAULT_NAME;

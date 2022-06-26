@@ -7,7 +7,7 @@ public class SQLClientFactory {
   public static SQLClient connectTo(Connection connection){
     return new SimpleSQLClient(connection);
   }
-  private static SQLClient connectTo(String jdbc,String username, String password){
+  public static SQLClient connectTo(String jdbc,String username, String password){
     return new SimpleSQLClient(deriveDriverClassFromConnectionString(jdbc),jdbc,username,password);
   }
   private static String deriveDriverClassFromConnectionString(String connectionString){

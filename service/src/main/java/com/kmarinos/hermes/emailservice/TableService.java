@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class TableService {
 
   public void addToExcel(Table table, Workbook wb) {
+    log.info("Adding table with {} rows.",table.getRows().size());
     XSSFSheet sheet;
     ExcelConfig excelConfig = new ExcelConfig(wb);
     if (table.getName() != null && !table.getName().isEmpty()) {
@@ -50,7 +51,7 @@ public class TableService {
       return;
     }
     for (int i = 0; i < table.getRows().size(); i++) {
-      Row row = sheet.createRow(currentRow + 1);
+      Row row = sheet.createRow(currentRow+i);
       for (int j = 0; j < table.getRows().get(i).getValues().size(); j++) {
         try {
           Object cellValue = table.getRows().get(i).getValues().get(j);

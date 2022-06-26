@@ -14,7 +14,12 @@ import com.kmarinos.hermes.domain.email.SerializableFunction;
 import com.kmarinos.hermes.domain.email.SerializablePredicate;
 import com.kmarinos.hermes.domain.email.Sheet;
 import com.kmarinos.hermes.domain.email.Table;
+import com.kmarinos.hermes.domain.email.TableHeader;
+import com.kmarinos.hermes.domain.email.TableRow;
 import com.kmarinos.hermes.domain.email.TablesAttachment;
+import com.kmarinos.hermes.emailclient.sql.SQLClient;
+import com.kmarinos.hermes.emailclient.sql.SQLClientFactory;
+import com.kmarinos.hermes.emailclient.sql.SelectResult;
 import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -142,7 +147,7 @@ public class EmailCompositionWorkflow {
     return this;
   }
   public EmailCompositionWorkflow attach(EmailAttachment attachment){
-    this.setAttachments(attachments);
+    this.getAttachments().add(attachment);
     return this;
   }
   //belongs to client
@@ -245,27 +250,27 @@ public class EmailCompositionWorkflow {
     }
     table.setHeaders(new ArrayList<>());
     table.setRows(new ArrayList<>());
-//    try{
-//      SQLClient sqlClient = SQLClientFactory.connectTo(sheet.getConnection());
-//      List<SelectResult> sqlRows = sqlClient.select(sheet.getSql()).andGet();
-//      for(int i = 0;i<sqlRows.size();i++){
-//        SelectResult ctx = sqlRows.get(i);
-//        //get headers form first line
-//        if(i==0){
-//          for(String key:ctx.getAll().keySet()){
-//            TableHeader header = TableHeader.builder()
-//                .name(key)
-//                .columnType(ctx.typeOf(key).getName())
-//                .build();
-//            table.getHeader().add(header);
-//          }
-//        }
-//        TableRow tableRow = new TableRow(new ArrayList<>(ctx.getAll().values()));
-//        table.getRows().add(tableRow);
-//      }
-//    }catch(Exception e){
-//      System.err.println(e.getMessage());
-//    }
+    try{
+      SQLClient sqlClient = SQLClientFactory.connectTo(sheet.getConnection());
+      List<SelectResult> sqlRows = sqlClient.select(sheet.getSql()).andGet();
+      for(int i = 0;i<sqlRows.size();i++){
+        SelectResult ctx = sqlRows.get(i);
+        //get headers form first line
+        if(i==0){
+          for(String key:ctx.getAll().keySet()){
+            TableHeader header = TableHeader.builder()
+                .name(key)
+                .columnType(ctx.typeOf(key).getName())
+                .build();
+            table.getHeaders().add(header);
+          }
+        }
+        TableRow tableRow = new TableRow(new ArrayList<>(ctx.getAll().values()));
+        table.getRows().add(tableRow);
+      }
+    }catch(Exception e){
+     e.printStackTrace();
+    }
     return table;
   }
 }

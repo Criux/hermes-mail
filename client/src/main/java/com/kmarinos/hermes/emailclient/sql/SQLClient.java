@@ -21,4 +21,7 @@ public abstract class SQLClient {
   public SQLExecutor select(String sql){
     return new SQLExecutor(sql,this);
   }
+  public Connection getConnection(){
+    return this.getValidConnection();
+  }
 }

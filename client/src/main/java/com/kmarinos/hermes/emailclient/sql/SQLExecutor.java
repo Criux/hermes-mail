@@ -78,7 +78,7 @@ public class SQLExecutor {
                 Class.forName(JDBC_TYPE_MAP.get(meta.getColumnTypeName(idx + 1).toUpperCase()));
             value = columnType.cast(rs.getObject(idx + 1));
           } catch (ClassNotFoundException e) {
-            System.err.println("Couldn't find class:" + columnName);
+            System.err.println("Couldn't find class " +meta.getColumnTypeName(idx+1)+" for "+ columnName);
             columnType = String.class;
             value = rs.getString(idx + 1);
           }
@@ -114,6 +114,7 @@ public class SQLExecutor {
           {"LONGNVARCHAR","java.lang.String"},
           {"GRAPHIC","java.lang.String"},
           {"VARGRAPHIC","java.lang.String"},
+          {"TEXT","java.lang.String"},
           {"NUMERIC","java.math.BigDecimal"},
           {"DECIMAL","java.math.BigDecimal"},
           {"NUMBER","java.math.BigDecimal"},
@@ -122,6 +123,10 @@ public class SQLExecutor {
           {"TINYINT","java.lang.Integer"},
           {"SMALLINT","java.lang.Integer"},
           {"INTEGER","java.lang.Integer"},
+          {"SERIAL","java.lang.Integer"},
+          {"SERIAL4","java.lang.Integer"},
+          {"INT2","java.lang.Integer"},
+          {"INT4","java.lang.Integer"},
           {"BIGINT","java.lang.Long"},
           {"REAL","java.lang.Float"},
           {"FLOAT","java.lang.Double"},
@@ -142,5 +147,8 @@ public class SQLExecutor {
           {"DATALINK","java.net.URL"},
           {"ROWID","java.sql.RowId"},
           {"SQLXML","java.sql.SQLXML"},
+          {"MPAA_RATING","java.lang.String"},
+          {"_TEXT","java.lang.String[]"},
+          {"TSVECTOR","org.postgresql.util.PGobject"},
       }).collect(Collectors.toMap(data->data[0],data->data[1]));
 }
