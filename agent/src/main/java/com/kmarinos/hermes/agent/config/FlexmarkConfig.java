@@ -1,4 +1,4 @@
-package com.kmarinos.hermes.emailservice.config;
+package com.kmarinos.hermes.agent.config;
 
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;

@@ -1,6 +1,10 @@
 package com.kmarinos.hermes.emailservice;
 
+import com.kmarinos.hermes.emailservice.dto.AgentDTO;
 import com.kmarinos.hermes.emailservice.model.Agent;
+import com.kmarinos.hermes.serviceDto.AgentGET;
+import com.kmarinos.hermes.serviceDto.AgentPOST;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +20,9 @@ public class AgentController {
 
   @PostMapping
   @RequestMapping("register")
-  public ResponseEntity<Agent> registerAgent(){
-    return ResponseEntity.ok().body(agentService.registerNewAgent());
+  public ResponseEntity<AgentGET> registerAgent(@RequestBody AgentPOST agentPOST,
+      HttpServletRequest request){
+    String fromUrl = "http://"+request.getRemoteAddr();
+    return ResponseEntity.ok().body(AgentDTO.GET(agentService.registerNewAgent(AgentDTO.POST(agentPOST,fromUrl))));
   }
 }

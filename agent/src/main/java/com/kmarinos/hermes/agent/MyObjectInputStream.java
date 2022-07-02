@@ -1,4 +1,4 @@
-package com.kmarinos.hermes.emailservice;
+package com.kmarinos.hermes.agent;
 
 import java.io.IOException;
 import java.io.InputStream;

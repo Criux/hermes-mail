@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +30,11 @@ public class Agent {
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
   String id;
   String friendlyName;
+  @Enumerated(EnumType.STRING)
   AgentStatus status;
+  String os;
+  String listeningOn;
+  long maxMemory;
   boolean canProcess;
   LocalDateTime heartbeat;
   @CreatedDate

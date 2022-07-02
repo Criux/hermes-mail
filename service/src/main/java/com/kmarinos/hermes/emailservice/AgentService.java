@@ -12,12 +12,10 @@ public class AgentService {
 
   private final AgentRepository agentRepository;
 
-  public Agent registerNewAgent() {
-    var agent = Agent.builder()
-        .status(AgentStatus.NOT_RESPONDING)
-        .canProcess(true)
-        .friendlyName("ImpressiveCantaloupe")
-        .build();
+  public Agent registerNewAgent(Agent agent) {
     return agentRepository.save(agent);
+  }
+  public Agent getNextAvailable(){
+    return agentRepository.findAllByCanProcessAndStatus(true,AgentStatus.NOT_RESPONDING).get(0);
   }
 }

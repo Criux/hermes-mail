@@ -1,4 +1,5 @@
-package com.kmarinos.hermes.emailservice.config;
+package com.kmarinos.hermes.agent.config;
+
 
 import java.util.Properties;
 import org.springframework.context.annotation.Bean;

@@ -17,6 +17,8 @@
 	<modules>
 		<module>domain</module>
 		<module>service</module>
+		<module>service-dto</module>
+		<module>agent</module>
 		<module>client</module>
 	</modules>
 	<properties>

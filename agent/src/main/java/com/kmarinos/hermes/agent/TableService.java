@@ -1,7 +1,7 @@
-package com.kmarinos.hermes.emailservice;
+package com.kmarinos.hermes.agent;
 
+import com.kmarinos.hermes.agent.config.ExcelConfig;
 import com.kmarinos.hermes.domain.email.Table;
-import com.kmarinos.hermes.emailservice.config.ExcelConfig;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -95,8 +95,8 @@ public class TableService {
       addCellToRow(row,pos,(LocalDateTime)value,excelConfig.getDateStyle());
     }else if(clazz.equals(java.sql.Date.class)){
       addCellToRow(row,pos,(java.sql.Date)value,excelConfig.getDateStyle());
-    }else if(clazz.equals(java.sql.Timestamp.class)){
-      addCellToRow(row,pos,(java.sql.Timestamp)value,excelConfig.getDateStyle());
+    }else if(clazz.equals(Timestamp.class)){
+      addCellToRow(row,pos,(Timestamp)value,excelConfig.getDateStyle());
     }else{
       addCellToRow(row,pos,"CANT PARSE:"+clazz.getName(),null);
     }

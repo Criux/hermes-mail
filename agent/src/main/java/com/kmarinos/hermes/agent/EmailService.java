@@ -1,4 +1,4 @@
-package com.kmarinos.hermes.emailservice.service;
+package com.kmarinos.hermes.agent;
 
 import com.kmarinos.hermes.domain.email.AttachmentFileType;
 import com.kmarinos.hermes.domain.email.ConditionalText;
@@ -8,7 +8,6 @@ import com.kmarinos.hermes.domain.email.EmailContext;
 import com.kmarinos.hermes.domain.email.EmailRecipient;
 import com.kmarinos.hermes.domain.email.Table;
 import com.kmarinos.hermes.domain.email.TablesAttachment;
-import com.kmarinos.hermes.emailservice.TableService;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import java.io.ByteArrayOutputStream;

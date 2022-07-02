@@ -1,4 +1,4 @@
-package com.kmarinos.hermes.emailservice.config;
+package com.kmarinos.hermes.agent.config;
 
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.CellStyle;

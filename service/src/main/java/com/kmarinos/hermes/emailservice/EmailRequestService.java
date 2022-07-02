@@ -1,4 +1,4 @@
-package com.kmarinos.hermes.emailservice.service;
+package com.kmarinos.hermes.emailservice;
 
 import com.kmarinos.hermes.emailservice.model.Client;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
