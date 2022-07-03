@@ -4,6 +4,8 @@ import com.kmarinos.hermes.emailservice.dto.AgentDTO;
 import com.kmarinos.hermes.emailservice.model.Agent;
 import com.kmarinos.hermes.serviceDto.AgentGET;
 import com.kmarinos.hermes.serviceDto.AgentPOST;
+import com.kmarinos.hermes.serviceDto.AgentPUT;
+import com.kmarinos.hermes.serviceDto.Heartbeat;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +26,10 @@ public class AgentController {
       HttpServletRequest request){
     String fromUrl = "http://"+request.getRemoteAddr();
     return ResponseEntity.ok().body(AgentDTO.GET(agentService.registerNewAgent(AgentDTO.POST(agentPOST,fromUrl))));
+  }
+  @PostMapping
+  @RequestMapping("heartbeat")
+  public ResponseEntity<Heartbeat> registerHeartbeat(@RequestBody AgentPUT agentPUT){
+    return ResponseEntity.ok(agentService.registerHeartbeat(AgentDTO.PUT(agentPUT)));
   }
 }

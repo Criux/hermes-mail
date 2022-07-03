@@ -19,15 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("email")
 @RequiredArgsConstructor
 @Slf4j
 public class EmailController {
   private final EmailService emailService;
 
-  @GetMapping("test")
-  public String testMe() {
-    return "Hello";
+  @GetMapping("ping")
+  public ResponseEntity<Void> ping() {
+    return ResponseEntity.accepted().build();
   }
 
   @PostMapping("assign")

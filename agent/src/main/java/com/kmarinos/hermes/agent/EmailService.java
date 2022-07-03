@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -38,6 +39,8 @@ public class EmailService {
   private final HtmlRenderer renderer;
 
   private Map<AttachmentFileType, String> mimeMap = new HashMap<>();
+  @Getter
+  private boolean canProcess=true;
 
   public EmailService(
       JavaMailSender sender, TableService tableService, Parser parser, HtmlRenderer renderer) {
@@ -53,6 +56,12 @@ public class EmailService {
   }
 
   public void send(Email email) {
+    canProcess=false;
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
     if (email.getToRecipients().isEmpty()) {
       log.warn("No recipients were defined. No email will be sent");
       return;
@@ -347,6 +356,8 @@ public class EmailService {
         sender.send(message);
       } catch (MessagingException e) {
         throw new RuntimeException(e);
+      }finally {
+        canProcess=true;
       }
     }
   }

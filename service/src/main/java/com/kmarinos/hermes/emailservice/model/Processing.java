@@ -20,6 +20,8 @@ public class Processing {
   String id;
   @ManyToOne
   Agent agent;
+  @ManyToOne
+  EmailRequest emailRequest;
   @Enumerated(EnumType.STRING)
   ProcessingStage stage;
   String secondaryStage;

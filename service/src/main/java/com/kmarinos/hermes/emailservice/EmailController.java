@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmailController {
   private final EmailRequestService emailRequestService;
   private final AgentService agentService;
-  private final RestTemplate restTemplate = new RestTemplate();
+
 
   @GetMapping("test")
   public String testMe() {
@@ -37,8 +37,8 @@ public class EmailController {
       throws IOException, SQLException {
     EmailRequest request =
         emailRequestService.registerEmailRequest(null, l.getBytes(), e.getBytes());
-    var agent = agentService.getNextAvailable();
-    restTemplate.postForEntity(agent.getListeningOn()+"/email/assign", EmailRequestDTO.GET(request),Void.class);
+
+    agentService.sendWithNextAvailableAgent(request);
 
 //    sendEmail(
 //        request.getL().getBinaryStream().readAllBytes(),
