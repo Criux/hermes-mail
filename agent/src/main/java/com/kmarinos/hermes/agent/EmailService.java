@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import lombok.Getter;
@@ -25,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -354,8 +357,20 @@ public class EmailService {
         helper.setSubject(email.getSubject());
         helper.setText(html, true);
         sender.send(message);
-      } catch (MessagingException e) {
-        throw new RuntimeException(e);
+      } catch (MailException | MessagingException e) {
+        if(e instanceof MailSendException){
+          var errors = ((MailSendException) e).getMessageExceptions();
+          for(Exception error:errors ){
+            if(error instanceof SendFailedException sendFailed){
+              log.error(sendFailed.getNextException().getMessage());
+            }else{
+              System.err.println("unknown send failed error");
+            }
+          }
+        }else{
+          System.err.println("Unknown error");
+          System.err.println(e.getMessage());
+        }
       }finally {
         canProcess=true;
       }

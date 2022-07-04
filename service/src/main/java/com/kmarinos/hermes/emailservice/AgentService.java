@@ -12,6 +12,7 @@ import com.kmarinos.hermes.serviceDto.HeartbeatStatus;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,21 +30,29 @@ public class AgentService {
   @Scheduled(cron = " */10 * * * * *")
   public void runAgentMaintenance() {
     log.info("Running maintenance...");
-    agentRepository.findAll().forEach(agent -> {
+    for(Agent agent:agentRepository.findAll()){
+      //agent has been registered but not yet reported a heartbeat
+      if(agent.getHeartbeat()== null){
+        continue;
+      }
       var now = LocalDateTime.now();
       //check if agent can be deleted
-      if (!agent.getStatus().equals(AgentStatus.ACTIVE) && agent.getHeartbeat()
+      if (!agent.getStatus().equals(AgentStatus.ACTIVE) && !agent.getStatus()
+          .equals(AgentStatus.INACTIVE) && agent.getHeartbeat()
           .isBefore(now.minusSeconds(120))) {
         log.info("Deleting inactive agent");
-        agentRepository.delete(agent);
+        agent.setStatus(AgentStatus.INACTIVE);
+        agent.setCanProcess(false);
+        agentRepository.save(agent);
       }
       //check if agent has not sent a heartbeat
-      else if (agent.getStatus().equals(AgentStatus.ACTIVE)&&agent.getHeartbeat().isBefore(now.minusSeconds(60))) {
-        agent.setStatus(AgentStatus.INACTIVE);
+      else if (agent.getStatus().equals(AgentStatus.ACTIVE) && agent.getHeartbeat()
+          .isBefore(now.minusSeconds(60))) {
+        agent.setStatus(AgentStatus.NOT_RESPONDING);
         log.info("Setting agent to inactive");
         agentRepository.save(agent);
       }
-    });
+    };
   }
 
   public Agent registerNewAgent(Agent agent) {
@@ -58,7 +67,7 @@ public class AgentService {
     var unknownAgent = Heartbeat.builder()
         .status(HeartbeatStatus.UNKNOWN_AGENT)
         .build();
-    if (agentReport == null||agentReport.getId() == null) {
+    if (agentReport == null || agentReport.getId() == null) {
       return unknownAgent;
     }
     return agentRepository.findById(agentReport.getId()).map(agent -> {
@@ -78,16 +87,18 @@ public class AgentService {
     return agentRepository.findAllByHeartbeatBefore(cutoff);
   }
 
-  public void sendWithNextAvailableAgent(EmailRequest emailRequest) {
+  public Optional<Agent> sendWithNextAvailableAgent(EmailRequest emailRequest) {
     for (Agent agent : this.getAvailableAgents()) {
-      var wasSent =agentRestClient.assignEmailToAgent(agent, emailRequest);
-      if(wasSent){
-        break;
-      }else{
+      var wasSent = agentRestClient.assignEmailToAgent(agent, emailRequest);
+      agent.setCanProcess(false);
+      if (!wasSent) {
         agent.setStatus(AgentStatus.NOT_RESPONDING);
-        agent.setCanProcess(false);
-        agentRepository.save(agent);
       }
+      agent = agentRepository.save(agent);
+      return agent.getStatus().equals(AgentStatus.NOT_RESPONDING) ?
+          Optional.empty()
+          :Optional.of(agent);
     }
+    return Optional.empty();
   }
 }

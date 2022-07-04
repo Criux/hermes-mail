@@ -1,6 +1,6 @@
 package com.kmarinos.hermes.emailservice.exceptionHandling.model;
 
-import com.kmarinos.amzmockproducts.exceptionHandling.model.ApiSubError;import lombok.AllArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

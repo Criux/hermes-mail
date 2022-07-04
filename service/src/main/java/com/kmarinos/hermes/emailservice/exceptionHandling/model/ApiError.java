@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
-import com.kmarinos.amzmockproducts.exceptionHandling.model.ApiSubError;
 import com.kmarinos.hermes.emailservice.exceptionHandling.ApiErrorClassNameResolver;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

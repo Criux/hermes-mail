@@ -16,19 +16,30 @@ public class TestMe {
   public static void main(String[] args){
 
     SQLClient sqlClient = SQLClientFactory.connectTo("jdbc:postgresql://localhost:5432/postgres?currentSchema=dvdrental","postgres","postgres");
-    for(int i = 0;i<1;i++){
-      Email.compose().to("bot2@mail.marinos.com")
-          .subject("test")
-          .body(Body.compose("::someText::"))
-          .param("someText",ctx->new Date().toString())
-          .attach(Excel.create().name("report.xlsx")
-              .sheet(
-                  Sheet.fromSQL(sqlClient.getConnection(),stmt1)
-              )
-          )
-          .send();
+    for(int i = 0;i<100;i++){
+      new Thread(()->{
+        Email.compose().to("bot2@mail.marinos.com")
+            .subject("test")
+            .body(Body.compose("::someText::"))
+//            .attach(Excel.create().name("report.xlsx")
+//                .sheet(
+//                    Sheet.fromSQL(sqlClient.getConnection(),stmt1)
+//                )
+//            )
+            .send();
+      }).start();
+//      Email.compose().to("bot2@mail.marinos.com")
+//          .subject("test")
+//          .body(Body.compose("::someText::"))
+//          .param("someText",ctx->new Date().toString())
+//          .attach(Excel.create().name("report.xlsx")
+//              .sheet(
+//                  Sheet.fromSQL(sqlClient.getConnection(),stmt1)
+//              )
+//          )
+//          .send();
       try {
-        Thread.sleep(2000);
+        Thread.sleep(50);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }

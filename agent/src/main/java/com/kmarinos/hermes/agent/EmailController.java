@@ -31,9 +31,12 @@ public class EmailController {
 
   @PostMapping("assign")
   public ResponseEntity<Void> webhookSendEmail(@RequestBody EmailRequestGET requestPOST){
-    log.info("Trying to send email");
-    sendEmail(requestPOST.getL(), requestPOST.getE());
-    log.info("Email sent");
+    new Thread(()->{
+      log.info("Trying to send email");
+      sendEmail(requestPOST.getL(), requestPOST.getE());
+      log.info("Email sent");
+    }).start();
+
 
     return ResponseEntity.accepted().build();
   }

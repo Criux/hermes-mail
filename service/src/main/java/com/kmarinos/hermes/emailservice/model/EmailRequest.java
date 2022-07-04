@@ -5,11 +5,14 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,6 +39,8 @@ public class EmailRequest {
   String subject;
   @Lob Blob l;
   @Lob Blob e;
+  @Enumerated(EnumType.STRING)
+  ProcessingStage status;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
