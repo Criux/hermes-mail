@@ -16,7 +16,7 @@ public class TestMe {
   public static void main(String[] args){
 
     SQLClient sqlClient = SQLClientFactory.connectTo("jdbc:postgresql://localhost:5432/postgres?currentSchema=dvdrental","postgres","postgres");
-    for(int i = 0;i<100;i++){
+    for(int i = 0;i<1;i++){
       new Thread(()->{
         Email.compose().to("bot2@mail.marinos.com")
             .subject("test")

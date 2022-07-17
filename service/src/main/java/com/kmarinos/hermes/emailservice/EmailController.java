@@ -39,10 +39,11 @@ public class EmailController {
       value = "send",
       consumes = {"multipart/form-data"})
   public ResponseEntity<Void> persistAndProcess(
-      @RequestParam("lambda") MultipartFile l, @RequestParam("email") MultipartFile e)
+      @RequestParam("lambda") MultipartFile l, @RequestParam("email") MultipartFile e, @RequestParam(required = false,name="attachments") MultipartFile a)
       throws IOException, SQLException {
-    EmailRequest request =
-        emailRequestService.registerEmailRequest(null, l.getBytes(), e.getBytes());
+    EmailRequest request = a==null?
+        emailRequestService.registerEmailRequest(null, l.getBytes(), e.getBytes()):
+        emailRequestService.registerEmailRequest(null, l.getBytes(), e.getBytes(),a.getBytes());
 
 //    agentService.sendWithNextAvailableAgent(request);
 

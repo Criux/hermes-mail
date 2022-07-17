@@ -52,14 +52,20 @@ public class EmailRequestService {
       }
     };
   }
+  public EmailRequest registerEmailRequest(Client client,byte[]lBytes,byte[]eBytes){
+    return this.registerEmailRequest(client,lBytes,eBytes,null);
+  }
 
-  public EmailRequest registerEmailRequest(Client client,byte[] lBytes,byte[]eBytes){
+  public EmailRequest registerEmailRequest(Client client,byte[] lBytes,byte[]eBytes, byte[] aBytes){
 
     var request =EmailRequest.builder()
         .client(client)
         .l(BlobProxy.generateProxy(lBytes))
         .e(BlobProxy.generateProxy(eBytes))
         .build();
+    if(aBytes!=null){
+      request.setA(BlobProxy.generateProxy(aBytes));
+    }
     var created = Processing.builder()
         .emailRequest(request)
         .stage(ProcessingStage.REQUESTED)

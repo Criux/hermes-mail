@@ -39,6 +39,7 @@ public class EmailRequest {
   String subject;
   @Lob Blob l;
   @Lob Blob e;
+  @Lob Blob a;
   @Enumerated(EnumType.STRING)
   ProcessingStage status;
 

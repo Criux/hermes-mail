@@ -54,6 +54,15 @@ public class MailService {
     out.flush();
     builder.addBinaryBody("email",bos.toByteArray(),ContentType.DEFAULT_BINARY,"email");
 
+    //upload attachments
+    if(email.getAttachments()!=null&& !email.getAttachments().isEmpty()){
+      bos = new ByteArrayOutputStream();
+      out = new ObjectOutputStream(bos);
+      out.writeObject(email.getAttachments());
+      out.flush();
+      builder.addBinaryBody("attachments",bos.toByteArray(),ContentType.DEFAULT_BINARY,"attachments");
+    }
+
     httpPost.setEntity(builder.build());
     CloseableHttpResponse response = client.execute(httpPost);
     int statusCode = response.getStatusLine().getStatusCode();
