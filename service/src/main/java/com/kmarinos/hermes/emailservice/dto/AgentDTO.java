@@ -17,7 +17,7 @@ public class AgentDTO {
     return Agent.builder()
         .status(AgentStatus.NOT_RESPONDING)
         .canProcess(true)
-        .friendlyName("ImpressiveCantaloupe")
+        .friendlyName(agentPOST.getFriendlyName())
         .os(agentPOST.getOs())
         .listeningOn(fromUrl+":"+agentPOST.getPort())
         .maxMemory(agentPOST.getMaxMemory())

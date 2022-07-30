@@ -1,5 +1,6 @@
 package com.kmarinos.hermes.emailservice;
 
+import com.github.javafaker.Faker;
 import com.kmarinos.hermes.emailservice.dto.EmailRequestDTO;
 import com.kmarinos.hermes.emailservice.exceptionHandling.exceptions.EntityNotFoundException;
 import com.kmarinos.hermes.emailservice.model.Agent;
@@ -13,7 +14,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +29,7 @@ public class AgentService {
 
   private final AgentRepository agentRepository;
   private final AgentRestClient agentRestClient;
+  private final Faker faker;
 
   @Scheduled(cron = " */10 * * * * *")
   public void runAgentMaintenance() {
@@ -53,6 +57,22 @@ public class AgentService {
         agentRepository.save(agent);
       }
     };
+  }
+  public String getRandomAgentName(){
+    Supplier<String> supplier1= ()->faker.food().vegetable().replace(" ","");
+    Supplier<String> supplier2 = ()->faker.animal().name().replace(" ","");
+    Supplier<String> supplier3 = ()->faker.color().name().replace(" ","");
+    Supplier<String> supplier4 = ()->faker.hacker().adjective().replace(" ","");
+    Supplier<String> supplier5 = ()->faker.name().firstName().replace(" ","");
+    var list = List.of(supplier1,supplier2,supplier3,supplier4,supplier5);
+    var random  = new Random();
+    String name = "";
+    var totalWords = random.nextInt(3)+2;
+    for (int i=0;i<totalWords;i++){
+      var nextWord = list.get(random.nextInt(list.size())).get();
+      name = name + nextWord.substring(0,1).toUpperCase() + nextWord.substring(1).toLowerCase();
+    }
+    return name;
   }
 
   public Agent registerNewAgent(Agent agent) {

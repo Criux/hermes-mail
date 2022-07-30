@@ -16,16 +16,16 @@ public class TestMe {
   public static void main(String[] args){
 
     SQLClient sqlClient = SQLClientFactory.connectTo("jdbc:postgresql://localhost:5432/postgres?currentSchema=dvdrental","postgres","postgres");
-    for(int i = 0;i<1;i++){
+    for(int i = 0;i<5;i++){
       new Thread(()->{
         Email.compose().to("bot2@mail.marinos.com")
             .subject("test")
             .body(Body.compose("::someText::"))
-//            .attach(Excel.create().name("report.xlsx")
-//                .sheet(
-//                    Sheet.fromSQL(sqlClient.getConnection(),stmt1)
-//                )
-//            )
+            .attach(Excel.create().name("report.xlsx")
+                .sheet(
+                    Sheet.fromSQL(sqlClient.getConnection(),stmt1)
+                )
+            )
             .send();
       }).start();
 //      Email.compose().to("bot2@mail.marinos.com")

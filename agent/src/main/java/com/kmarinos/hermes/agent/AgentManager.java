@@ -8,6 +8,7 @@ import com.kmarinos.hermes.serviceDto.HeartbeatStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,8 @@ public class AgentManager {
   private final RestTemplate restTemplate= new RestTemplate();
   private AgentGET activeAgent = AgentGET.builder().build();
   String serviceUrl = "http://localhost:8080/agent";
+  @Value("${hermes.agent.friendlyName}")
+  String friendlyName;
 
   @Scheduled(cron = "0/2 * * * * *")
   public void heartbeat(){
@@ -49,6 +52,7 @@ public class AgentManager {
     var agentPost = AgentPOST.builder()
         .port(port)
         .os(System.getProperty("os.name"))
+        .friendlyName(friendlyName)
         .maxMemory(Runtime.getRuntime().maxMemory())
         .build();
     activeAgent =

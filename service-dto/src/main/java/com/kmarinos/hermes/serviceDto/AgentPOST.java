@@ -13,6 +13,7 @@ public class AgentPOST {
 
   int port;
   String os;
+  String friendlyName;
   long maxMemory;
 
 }
