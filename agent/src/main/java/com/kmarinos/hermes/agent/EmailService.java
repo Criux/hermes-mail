@@ -8,11 +8,13 @@ import com.kmarinos.hermes.domain.email.EmailContext;
 import com.kmarinos.hermes.domain.email.EmailRecipient;
 import com.kmarinos.hermes.domain.email.Table;
 import com.kmarinos.hermes.domain.email.TablesAttachment;
+import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +46,16 @@ public class EmailService {
   private Map<AttachmentFileType, String> mimeMap = new HashMap<>();
   @Getter
   private boolean canProcess=true;
+  private final BackendClient backendClient;
 
   public EmailService(
-      JavaMailSender sender, TableService tableService, Parser parser, HtmlRenderer renderer) {
+      JavaMailSender sender, TableService tableService, Parser parser, HtmlRenderer renderer,
+      BackendClient backendClient) {
     this.sender = sender;
     this.tableService = tableService;
     this.parser = parser;
     this.renderer = renderer;
+    this.backendClient = backendClient;
 
     this.mimeMap.put(
         AttachmentFileType.EXCEL,
@@ -376,6 +381,18 @@ public class EmailService {
       }
     }
   }
+  public void processAttachments(String emailRequestId, List<EmailAttachment> attachmentList) {
+    attachmentList.stream().map(this::preparedAttachment).flatMap(Collection::stream)
+        .map(attachment -> {
+          return AttachedFilePOST.builder()
+              .emailRequestId(emailRequestId)
+              .content(attachment.getContent())
+              .filename(attachment.getName())
+              .fileType(attachment.getType().name())
+              .build();
+        })
+        .forEach(backendClient::registerAttachment);
+  }
   private List<EmailAttachment> preparedAttachment(EmailAttachment attachment){
     if(attachment.getClass().equals(TablesAttachment.class)){
       return prepareTablesAttachment((TablesAttachment)attachment);
@@ -407,4 +424,6 @@ public class EmailService {
     tablesAttachment.setContent(out.toByteArray());
     return tablesAttachment;
   }
+
+
 }

@@ -20,51 +20,47 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AgentManager {
 
-  private final ServletWebServerApplicationContext webServerApplicationContext;
   private final EmailService emailService;
+  private final BackendClient backendClient;
 
-  private final RestTemplate restTemplate= new RestTemplate();
   private AgentGET activeAgent = AgentGET.builder().build();
-  String serviceUrl = "http://localhost:8080/agent";
   @Value("${hermes.agent.friendlyName}")
   String friendlyName;
 
   @Scheduled(cron = "0/2 * * * * *")
-  public void heartbeat(){
+  public void heartbeat() {
     log.info("Sending heartbeat");
-    try{
+    try {
       var heartbeat = sendHeartbeat();
-      if(heartbeat == null || heartbeat.getStatus().equals(HeartbeatStatus.UNKNOWN_AGENT)){
+      if (heartbeat == null || heartbeat.getStatus().equals(HeartbeatStatus.UNKNOWN_AGENT)) {
         registerNewAgent();
       }
-    }catch (Exception e){
-     if (e instanceof ResourceAccessException){
+    } catch (Exception e) {
+      if (e instanceof ResourceAccessException) {
         log.error(e.getMessage());
-      }else{
-       throw e;
-     }
+      } else {
+        throw e;
+      }
     }
 
   }
 
-  public void registerNewAgent(){
-    int port = webServerApplicationContext.getWebServer().getPort();
+  public void registerNewAgent() {
     var agentPost = AgentPOST.builder()
-        .port(port)
         .os(System.getProperty("os.name"))
         .friendlyName(friendlyName)
         .maxMemory(Runtime.getRuntime().maxMemory())
         .build();
-    activeAgent =
-        restTemplate.postForEntity(serviceUrl+"/register", agentPost, AgentGET.class).getBody();
+    activeAgent = backendClient.registerAgent(agentPost);
     assert activeAgent != null;
-    log.info("registered agent {} with id {}",activeAgent.getFriendlyName(),activeAgent.getId());
+    log.info("registered agent {} with id {}", activeAgent.getFriendlyName(), activeAgent.getId());
   }
-  public Heartbeat sendHeartbeat(){
+
+  public Heartbeat sendHeartbeat() {
     var reportStatus = AgentPUT.builder()
         .id(activeAgent.getId())
         .canProcess(emailService.isCanProcess())
         .build();
-    return restTemplate.postForEntity(serviceUrl+"/heartbeat", reportStatus, Heartbeat.class).getBody();
+    return backendClient.sendHeartbeat(reportStatus);
   }
 }

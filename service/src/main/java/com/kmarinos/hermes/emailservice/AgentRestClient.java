@@ -15,9 +15,10 @@ public class AgentRestClient {
   private final RestTemplate restTemplate = new RestTemplate();
 
   public boolean assignEmailToAgent(Agent agent, EmailRequest emailRequest) {
+    log.info("Assigning email to {}",agent.getFriendlyName());
 
     try{
-      restTemplate.postForEntity(agent.getListeningOn()+"/assign", EmailRequestDTO.GET(emailRequest),Void.class);
+      restTemplate.postForEntity(agent.getListeningOn()+"/assign-email", EmailRequestDTO.GET(emailRequest),Void.class);
     }catch(RestClientException e){
       log.error("Cannot connect to agent with id {}",agent.getId());
       return false;
@@ -26,5 +27,16 @@ public class AgentRestClient {
   }
   public boolean pingAgent(Agent agent){
     return restTemplate.getForEntity(agent.getListeningOn()+"/ping",Void.class).getStatusCode().is2xxSuccessful();
+  }
+
+  public boolean assignAttachmentToAgent(Agent agent, EmailRequest emailRequest) {
+    log.info("Assigning attachment to {}",agent.getFriendlyName());
+    try{
+      restTemplate.postForEntity(agent.getListeningOn()+"/assign-attachments", EmailRequestDTO.AttachmentGET(emailRequest),Void.class);
+    }catch(RestClientException e){
+      log.error("Cannot connect to agent with id {}",agent.getId());
+      return false;
+    }
+    return true;
   }
 }
