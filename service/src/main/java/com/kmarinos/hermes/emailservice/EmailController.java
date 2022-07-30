@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class EmailController {
   private final EmailRequestService emailRequestService;
-  private final AgentService agentService;
+  private final FileService fileService;
 
 
   @GetMapping("test")
@@ -37,7 +37,8 @@ public class EmailController {
   @PostMapping("attach/{erid}")
   public ResponseEntity<Void> registerProcessedAttachment(@PathVariable("erid")String emailRequestId,@RequestBody
   AttachedFilePOST emailAttachmentPOST){
-    log.info("Attachment registerd...");
+    log.info("Attachment registered...");
+    fileService.createAttachedFile(emailAttachmentPOST,emailRequestService::getEmailRequestById);
     return ResponseEntity.accepted().build();
   }
 

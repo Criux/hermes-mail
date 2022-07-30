@@ -1,6 +1,8 @@
 package com.kmarinos.hermes.emailservice.dto;
 
+import com.kmarinos.hermes.emailservice.model.AttachedFile;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
+import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
 import com.kmarinos.hermes.serviceDto.AttachmentRequestGET;
 import com.kmarinos.hermes.serviceDto.EmailRequestGET;
 import java.io.IOException;

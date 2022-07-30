@@ -24,7 +24,7 @@ public class AgentManager {
   private final BackendClient backendClient;
 
   private AgentGET activeAgent = AgentGET.builder().build();
-  @Value("${hermes.agent.friendlyName}")
+  @Value("${hermes.email.agent.friendlyName}")
   String friendlyName;
 
   @Scheduled(cron = "0/2 * * * * *")

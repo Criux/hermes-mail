@@ -21,7 +21,12 @@ public class TestMe {
         Email.compose().to("bot2@mail.marinos.com")
             .subject("test")
             .body(Body.compose("::someText::"))
-            .attach(Excel.create().name("report.xlsx")
+            .attach(Excel.create().name("report1.xlsx")
+                .sheet(
+                    Sheet.fromSQL(sqlClient.getConnection(),stmt1)
+                )
+            )
+            .attach(Excel.create().name("report2.xlsx")
                 .sheet(
                     Sheet.fromSQL(sqlClient.getConnection(),stmt1)
                 )

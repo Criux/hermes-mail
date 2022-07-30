@@ -15,7 +15,7 @@ public class BackendClient {
 
   private final RestTemplate restTemplate = new RestTemplate();
   private final ServletWebServerApplicationContext webServerApplicationContext;
-  @Value("${hermes.serviceUrl}")
+  @Value("${hermes.email.serviceUrl}")
   String serviceUrl;
 
 
