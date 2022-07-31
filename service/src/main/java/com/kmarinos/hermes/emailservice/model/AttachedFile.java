@@ -22,12 +22,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class AttachedFile {
+public class AttachedFile extends BaseEntity{
 
-  @Id
-  @GenericGenerator(name = "uuid2", strategy = "uuid2")
-  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-  String id;
   String filename;
   String filetype;
   long size;

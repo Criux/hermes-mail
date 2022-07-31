@@ -9,6 +9,7 @@ import com.kmarinos.hermes.domain.email.EmailRecipient;
 import com.kmarinos.hermes.domain.email.Table;
 import com.kmarinos.hermes.domain.email.TablesAttachment;
 import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
+import com.kmarinos.hermes.serviceDto.ProgressReport;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import java.io.ByteArrayOutputStream;

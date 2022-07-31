@@ -41,7 +41,11 @@ public class Processing {
   @Enumerated(EnumType.STRING)
   ProcessingStage stage;
   String secondaryStage;
+  @Column(length = 10485760)
   String message;
+  @Enumerated(EnumType.STRING)
+  @Builder.Default
+  ProcessingCompletionType type = ProcessingCompletionType.SUCCESS;
   @CreatedDate
   @Column(nullable = false, updatable = false)
   LocalDateTime createdAt = LocalDateTime.now();

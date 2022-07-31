@@ -1,13 +1,19 @@
 package com.kmarinos.hermes.emailservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kmarinos.hermes.emailservice.model.Agent;
 import com.kmarinos.hermes.emailservice.model.AttachedFile;
 import com.kmarinos.hermes.emailservice.model.Client;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
 import com.kmarinos.hermes.emailservice.model.EmailRequestRepository;
 import com.kmarinos.hermes.emailservice.model.Processing;
+import com.kmarinos.hermes.emailservice.model.ProcessingCompletionType;
+import com.kmarinos.hermes.emailservice.model.ProcessingMessage;
 import com.kmarinos.hermes.emailservice.model.ProcessingRepository;
 import com.kmarinos.hermes.emailservice.model.ProcessingStage;
+import com.kmarinos.hermes.serviceDto.ProgressReport;
+import com.kmarinos.hermes.serviceDto.ProgressReportType;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -27,6 +33,7 @@ public class EmailRequestService {
   private final ProcessingRepository processingRepository;
 
   private final AgentService agentService;
+  ObjectMapper objectMapper = new ObjectMapper();
 
   @Scheduled(cron ="*/10 * * * * *")
   @Transactional
@@ -36,14 +43,24 @@ public class EmailRequestService {
     log.info("Check email queue...");
     checkIfEmailNeedsToBeAssigned();
   }
-  public void registerAttachmentProcessed(AttachedFile attachedFile,Agent agent) {
+  public void registerAttachmentProcessed(AttachedFile attachedFile, ProgressReport<?> pr,Agent agent) {
+    var pm = ProcessingMessage.builder()
+        .entity(attachedFile)
+        .log(pr.getLog())
+        .message(pr.getMessage())
+        .build();
     var processing = Processing.builder()
         .emailRequest(attachedFile.getEmailRequest())
         .stage(ProcessingStage.PROCESSING_ATTACHMENTS)
         .agent(agent)
         .secondaryStage("ATTACHMENT_PROCESSED")
-        .message("Processing of file "+attachedFile.getFilename())
         .build();
+    processing.setType(pr.getType().equals(ProgressReportType.SUCCESS)? ProcessingCompletionType.SUCCESS:ProcessingCompletionType.ERROR);
+    try {
+      processing.setMessage(objectMapper.writeValueAsString(pm));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
     processingRepository.saveAndFlush(processing);
     log.info("Processed attachment {} in {}",attachedFile.getFilename(),attachedFile.getPath());
   }

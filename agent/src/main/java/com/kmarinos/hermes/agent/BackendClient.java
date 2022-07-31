@@ -5,6 +5,8 @@ import com.kmarinos.hermes.serviceDto.AgentPOST;
 import com.kmarinos.hermes.serviceDto.AgentPUT;
 import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
 import com.kmarinos.hermes.serviceDto.Heartbeat;
+import com.kmarinos.hermes.serviceDto.ProgressReport;
+import com.kmarinos.hermes.serviceDto.ProgressReportType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.http.HttpEntity;
@@ -44,7 +46,13 @@ public class BackendClient {
     return post("/agent/heartbeat",reportStatus, Heartbeat.class);
   }
   public void registerAttachment(AttachedFilePOST attachmentPost){
-    post("/email/attach/"+attachmentPost.getEmailRequestId(),attachmentPost,Void.class);
+    ProgressReport<AttachedFilePOST> pr = ProgressReport.<AttachedFilePOST>builder()
+        .payload(attachmentPost)
+        .message("Processed file successfully")
+        .type(ProgressReportType.SUCCESS)
+        .log("")
+        .build();
+    post("/email/attach/"+attachmentPost.getEmailRequestId(),pr,Void.class);
 
   }
   private <T> T post(String endpoint,Object body,Class<T> returnClass){

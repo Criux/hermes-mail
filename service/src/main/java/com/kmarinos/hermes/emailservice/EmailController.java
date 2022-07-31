@@ -1,9 +1,12 @@
 package com.kmarinos.hermes.emailservice;
 
 import com.kmarinos.hermes.emailservice.model.Agent;
+import com.kmarinos.hermes.emailservice.model.AttachedFile;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
 import com.kmarinos.hermes.emailservice.model.Processing;
+import com.kmarinos.hermes.emailservice.model.ProcessingMessage;
 import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
+import com.kmarinos.hermes.serviceDto.ProgressReport;
 import java.io.IOException;
 import java.sql.SQLException;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +42,11 @@ public class EmailController {
   }
   @PostMapping("attach/{erid}")
   public ResponseEntity<Void> registerProcessedAttachment(@PathVariable("erid")String emailRequestId,@RequestBody
-  AttachedFilePOST emailAttachmentPOST, @RequestHeader("X-Agent-Token") String agentToken){
+  ProgressReport<AttachedFilePOST> pr, @RequestHeader("X-Agent-Token") String agentToken){
     Agent agent=agentService.getAgentFromToken(agentToken);
     log.info("Attachment registered...");
-    var attachedFile =fileService.createAttachedFile(emailAttachmentPOST,emailRequestService::getEmailRequestById);
-    emailRequestService.registerAttachmentProcessed(attachedFile,agent);
+    var attachedFile =fileService.createAttachedFile(pr.getPayload(),emailRequestService::getEmailRequestById);
+    emailRequestService.registerAttachmentProcessed(attachedFile,pr,agent);
     return ResponseEntity.accepted().build();
   }
   @PostMapping("complete-attachments/{erid}")
