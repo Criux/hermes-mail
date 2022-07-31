@@ -24,7 +24,7 @@ public class FileService {
   String rootPath;
   private final AttachedFileRepository attachedFileRepository;
 
-  public void createAttachedFile(AttachedFilePOST emailAttachmentPOST,
+  public AttachedFile createAttachedFile(AttachedFilePOST emailAttachmentPOST,
       Function<String, EmailRequest> requestProvider) {
     var request = requestProvider.apply(emailAttachmentPOST.getEmailRequestId());
     var file = attachedFileRepository.save(AttachedFile.builder()
@@ -33,7 +33,7 @@ public class FileService {
         .filetype(emailAttachmentPOST.getFileType())
         .build());
     this.saveFileToDisk(file, emailAttachmentPOST.getContent());
-    attachedFileRepository.save(file);
+    return attachedFileRepository.save(file);
   }
 
   private void saveFileToDisk(AttachedFile file, byte[] content) {

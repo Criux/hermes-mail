@@ -42,7 +42,8 @@ public class EmailController {
   AttachedFilePOST emailAttachmentPOST, @RequestHeader("X-Agent-Token") String agentToken){
     Agent agent=agentService.getAgentFromToken(agentToken);
     log.info("Attachment registered...");
-    fileService.createAttachedFile(emailAttachmentPOST,emailRequestService::getEmailRequestById);
+    var attachedFile =fileService.createAttachedFile(emailAttachmentPOST,emailRequestService::getEmailRequestById);
+    emailRequestService.registerAttachmentProcessed(attachedFile,agent);
     return ResponseEntity.accepted().build();
   }
   @PostMapping("complete-attachments/{erid}")

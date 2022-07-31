@@ -1,6 +1,7 @@
 package com.kmarinos.hermes.emailservice;
 
 import com.kmarinos.hermes.emailservice.model.Agent;
+import com.kmarinos.hermes.emailservice.model.AttachedFile;
 import com.kmarinos.hermes.emailservice.model.Client;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
 import com.kmarinos.hermes.emailservice.model.EmailRequestRepository;
@@ -34,6 +35,17 @@ public class EmailRequestService {
     checkIfAttachmentsNeedToBeAssigned();
     log.info("Check email queue...");
     checkIfEmailNeedsToBeAssigned();
+  }
+  public void registerAttachmentProcessed(AttachedFile attachedFile,Agent agent) {
+    var processing = Processing.builder()
+        .emailRequest(attachedFile.getEmailRequest())
+        .stage(ProcessingStage.PROCESSING_ATTACHMENTS)
+        .agent(agent)
+        .secondaryStage("ATTACHMENT_PROCESSED")
+        .message("Processing of file "+attachedFile.getFilename())
+        .build();
+    processingRepository.saveAndFlush(processing);
+    log.info("Processed attachment {} in {}",attachedFile.getFilename(),attachedFile.getPath());
   }
   public void completeAttachmentProcessing(EmailRequest emailRequest,Agent agent) {
     var processing = Processing.builder()
@@ -104,6 +116,7 @@ public class EmailRequestService {
   public EmailRequest getEmailRequestById(String id){
     return emailRequestRepository.findById(id).orElseThrow(()->new RuntimeException("Cant find email request with id "+id));
   }
+
 
 
 }
