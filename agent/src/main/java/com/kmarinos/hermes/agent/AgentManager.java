@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
@@ -23,9 +24,11 @@ public class AgentManager {
   private final EmailService emailService;
   private final BackendClient backendClient;
 
-  private AgentGET activeAgent = AgentGET.builder().build();
+
+  private final AgentGET activeAgent;
   @Value("${hermes.email.agent.friendlyName}")
   String friendlyName;
+
 
   @Scheduled(cron = "0/2 * * * * *")
   public void heartbeat() {
@@ -51,8 +54,8 @@ public class AgentManager {
         .friendlyName(friendlyName)
         .maxMemory(Runtime.getRuntime().maxMemory())
         .build();
-    activeAgent = backendClient.registerAgent(agentPost);
-    assert activeAgent != null;
+    assert backendClient.registerAgent(agentPost) != null;
+    activeAgent.setId(backendClient.registerAgent(agentPost).getId());
     log.info("registered agent {} with id {}", activeAgent.getFriendlyName(), activeAgent.getId());
   }
 

@@ -19,6 +19,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Immutable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
@@ -26,7 +27,7 @@ import org.springframework.data.annotation.Immutable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Immutable
-@EntityListeners(ProcessingListener.class)
+@EntityListeners({ProcessingListener.class, AuditingEntityListener.class})
 public class Processing {
 
   @Id
@@ -43,7 +44,6 @@ public class Processing {
   String message;
   @CreatedDate
   @Column(nullable = false, updatable = false)
-  @Builder.Default
   LocalDateTime createdAt = LocalDateTime.now();
 
 }

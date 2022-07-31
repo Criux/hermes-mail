@@ -392,6 +392,7 @@ public class EmailService {
               .build();
         })
         .forEach(backendClient::registerAttachment);
+    backendClient.completeAttachments(emailRequestId);
   }
   private List<EmailAttachment> preparedAttachment(EmailAttachment attachment){
     if(attachment.getClass().equals(TablesAttachment.class)){

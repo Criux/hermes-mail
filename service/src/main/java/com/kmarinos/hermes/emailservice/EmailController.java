@@ -1,5 +1,6 @@
 package com.kmarinos.hermes.emailservice;
 
+import com.kmarinos.hermes.emailservice.model.Agent;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
 import com.kmarinos.hermes.emailservice.model.Processing;
 import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmailController {
   private final EmailRequestService emailRequestService;
   private final FileService fileService;
+  private final AgentService agentService;
 
 
   @GetMapping("test")
@@ -36,9 +39,17 @@ public class EmailController {
   }
   @PostMapping("attach/{erid}")
   public ResponseEntity<Void> registerProcessedAttachment(@PathVariable("erid")String emailRequestId,@RequestBody
-  AttachedFilePOST emailAttachmentPOST){
+  AttachedFilePOST emailAttachmentPOST, @RequestHeader("X-Agent-Token") String agentToken){
+    Agent agent=agentService.getAgentFromToken(agentToken);
     log.info("Attachment registered...");
     fileService.createAttachedFile(emailAttachmentPOST,emailRequestService::getEmailRequestById);
+    return ResponseEntity.accepted().build();
+  }
+  @PostMapping("complete-attachments/{erid}")
+  public ResponseEntity<Void>completeAttachments(@PathVariable("erid")String emailRequestId,@RequestHeader("X-Agent-Token") String agentToken){
+    Agent agent=agentService.getAgentFromToken(agentToken);
+    var emailRequest=emailRequestService.getEmailRequestById(emailRequestId);
+    emailRequestService.completeAttachmentProcessing(emailRequest,agent);
     return ResponseEntity.accepted().build();
   }
 

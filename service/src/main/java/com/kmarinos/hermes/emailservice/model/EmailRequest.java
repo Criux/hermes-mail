@@ -2,11 +2,13 @@ package com.kmarinos.hermes.emailservice.model;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,12 +36,19 @@ public class EmailRequest {
   @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
   String id;
 
-  @ManyToOne Client client;
+  @ManyToOne
+  Client client;
   String body;
   String subject;
-  @Lob Blob l;
-  @Lob Blob e;
-  @Lob Blob a;
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  Blob l;
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  Blob e;
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  Blob a;
   @Enumerated(EnumType.STRING)
   ProcessingStage status;
 

@@ -1,6 +1,7 @@
 package com.kmarinos.hermes.emailservice;
 
 import com.github.javafaker.Faker;
+import com.kmarinos.hermes.emailservice.exceptionHandling.exceptions.EntityNotFoundException;
 import com.kmarinos.hermes.emailservice.model.Agent;
 import com.kmarinos.hermes.emailservice.model.AgentRepository;
 import com.kmarinos.hermes.emailservice.model.AgentStatus;
@@ -143,5 +144,9 @@ public class AgentService {
           : Optional.of(agent);
     }
     return Optional.empty();
+  }
+
+  public Agent getAgentFromToken(String agentToken) {
+    return agentRepository.findById(agentToken).orElseThrow(()->new EntityNotFoundException(Agent.class,"id"));
   }
 }

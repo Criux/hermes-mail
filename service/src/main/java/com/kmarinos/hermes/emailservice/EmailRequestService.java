@@ -35,6 +35,15 @@ public class EmailRequestService {
     log.info("Check email queue...");
     checkIfEmailNeedsToBeAssigned();
   }
+  public void completeAttachmentProcessing(EmailRequest emailRequest,Agent agent) {
+    var processing = Processing.builder()
+        .emailRequest(emailRequest)
+        .stage(ProcessingStage.COMPLETED_ATTACHMENTS)
+        .agent(agent)
+        .build();
+    processingRepository.saveAndFlush(processing);
+    log.info("Closing processing of attachments");
+  }
   public void checkIfEmailNeedsToBeAssigned(){
     this.advanceRequest(ProcessingStage.COMPLETED_ATTACHMENTS,ProcessingStage.ACCEPTED_EMAIL,
         agentService::getAvailableEmailAgents, agentService.assignEmail());
@@ -49,8 +58,8 @@ public class EmailRequestService {
     log.info("Total requests to process "+requests.size());
     for(EmailRequest emailRequest:requests){
       //make sure that no agent has accepted it first
-      var shouldAssign =processingRepository.findAllByEmailRequest(emailRequest).stream().noneMatch(processing -> {
-        return processing.getAgent()!=null;
+      var shouldAssign =processingRepository.findAllByEmailRequest(emailRequest).stream().anyMatch(processing -> {
+        return processing.getStage().equals(start);
       });
       if(shouldAssign){
         var agentOptional = agentService.sendWithNextAvailableAgent(emailRequest,
@@ -95,4 +104,6 @@ public class EmailRequestService {
   public EmailRequest getEmailRequestById(String id){
     return emailRequestRepository.findById(id).orElseThrow(()->new RuntimeException("Cant find email request with id "+id));
   }
+
+
 }
