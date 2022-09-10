@@ -7,17 +7,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Data
-public class EmailInstance {
-
-  @Id
-  @GenericGenerator(name = "uuid2", strategy = "uuid2")
-  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-  String id;
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class EmailInstance extends BaseEntity{
 
   @ManyToOne
   EmailRequest emailRequest;

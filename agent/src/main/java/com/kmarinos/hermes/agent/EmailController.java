@@ -7,7 +7,6 @@ import com.kmarinos.hermes.serviceDto.EmailRequestGET;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,9 +33,10 @@ public class EmailController {
 
   @PostMapping("assign-email")
   public ResponseEntity<Void> webhookSendEmail(@RequestBody EmailRequestGET requestPOST){
+    emailService.setCanProcess(false);
     new Thread(()->{
       log.info("Trying to send email");
-      sendEmail(requestPOST.getL(), requestPOST.getE());
+      sendEmail(requestPOST);
       log.info("Email sent");
     }).start();
 
@@ -54,42 +53,42 @@ public class EmailController {
     return ResponseEntity.accepted().build();
   };
 
-  @PostMapping(
-      value = "send",
-      consumes = {"multipart/form-data"})
-  public ResponseEntity<Void> send(
-      @RequestParam("lambda") MultipartFile l, @RequestParam("email") MultipartFile e)
-      throws IOException, SQLException {
-    MyClassLoader myClassLoader = null;
-    try {
-      Map<String, byte[]> classes =
-          (Map<String, byte[]>) new ObjectInputStream(new ByteArrayInputStream(l.getBytes())).readObject();
-      myClassLoader = new MyClassLoader(this.getClass().getClassLoader(), classes);
-      for (String className : classes.keySet()) {
-        try {
-          myClassLoader.loadClass(className);
-        } catch (Exception ex) {
-          System.err.println("Class not found 1");
-        }
-      }
-    } catch (Exception ex) {
-      System.err.println("Class not found 2");
-    }
-    Object obj = null;
-    try {
-      System.out.println((e.getBytes().length / 1024) + " KB");
-      obj = new MyObjectInputStream(new ByteArrayInputStream(e.getBytes()), myClassLoader).readObject();
-      if (obj.getClass().equals(Email.class)) {
-        Email email = (Email) obj;
-        emailService.send(email);
-      }
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    } catch (ClassNotFoundException ex) {
-      ex.printStackTrace();
-    }
-    return ResponseEntity.accepted().build();
-  }
+//  @PostMapping(
+//      value = "send",
+//      consumes = {"multipart/form-data"})
+//  public ResponseEntity<Void> send(
+//      @RequestParam("lambda") MultipartFile l, @RequestParam("email") MultipartFile e)
+//      throws IOException, SQLException {
+//    MyClassLoader myClassLoader = null;
+//    try {
+//      Map<String, byte[]> classes =
+//          (Map<String, byte[]>) new ObjectInputStream(new ByteArrayInputStream(l.getBytes())).readObject();
+//      myClassLoader = new MyClassLoader(this.getClass().getClassLoader(), classes);
+//      for (String className : classes.keySet()) {
+//        try {
+//          myClassLoader.loadClass(className);
+//        } catch (Exception ex) {
+//          System.err.println("Class not found 1");
+//        }
+//      }
+//    } catch (Exception ex) {
+//      System.err.println("Class not found 2");
+//    }
+//    Object obj = null;
+//    try {
+//      System.out.println((e.getBytes().length / 1024) + " KB");
+//      obj = new MyObjectInputStream(new ByteArrayInputStream(e.getBytes()), myClassLoader).readObject();
+//      if (obj.getClass().equals(Email.class)) {
+//        Email email = (Email) obj;
+//        emailService.send(email);
+//      }
+//    } catch (IOException ex) {
+//      ex.printStackTrace();
+//    } catch (ClassNotFoundException ex) {
+//      ex.printStackTrace();
+//    }
+//    return ResponseEntity.accepted().build();
+//  }
   private void processAttachments(String emailRequestId,byte[] a){
     Object obj = null;
     try {
@@ -112,7 +111,10 @@ public class EmailController {
     }
   }
 
-    public void sendEmail(byte[] l, byte[] e) {
+    public void sendEmail(EmailRequestGET emailRequest) {
+    byte[] e = emailRequest.getE();
+    byte[] l = emailRequest.getL();
+    String emailRequestId = emailRequest.getId();
     MyClassLoader myClassLoader = null;
     try {
       Map<String, byte[]> classes =
@@ -134,12 +136,14 @@ public class EmailController {
       obj = new MyObjectInputStream(new ByteArrayInputStream(e), myClassLoader).readObject();
       if (obj.getClass().equals(Email.class)) {
         Email email = (Email) obj;
-        emailService.send(email);
+        emailService.processEmail(email,emailRequestId);
       }
     } catch (IOException ex) {
       ex.printStackTrace();
     } catch (ClassNotFoundException ex) {
       ex.printStackTrace();
+    }finally {
+      emailService.setCanProcess(true);
     }
   }
   public ResponseEntity<Void> multipart(

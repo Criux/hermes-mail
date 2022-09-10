@@ -31,6 +31,7 @@ public class TestMe {
                     Sheet.fromSQL(sqlClient.getConnection(),stmt1)
                 )
             )
+            .param("someText","email text")
             .send();
       }).start();
 //      Email.compose().to("bot2@mail.marinos.com")

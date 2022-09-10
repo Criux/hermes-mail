@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +70,17 @@ public class FileService {
         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
         .toString();
 
+  }
+
+  public List<AttachedFile> fetchAttachments(EmailRequest emailRequest) {
+    return attachedFileRepository.findAttachedFileByEmailRequest(emailRequest);
+  }
+  public byte[] getFileContent(String path){
+    try {
+      return Files.readAllBytes(Paths.get(path));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return new byte[0];
   }
 }

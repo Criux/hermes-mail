@@ -1,14 +1,19 @@
 package com.kmarinos.hermes.emailservice;
 
+import com.kmarinos.hermes.emailservice.dto.AttachedFileDTO;
 import com.kmarinos.hermes.emailservice.model.Agent;
 import com.kmarinos.hermes.emailservice.model.AttachedFile;
+import com.kmarinos.hermes.emailservice.model.EmailInstance;
 import com.kmarinos.hermes.emailservice.model.EmailRequest;
 import com.kmarinos.hermes.emailservice.model.Processing;
 import com.kmarinos.hermes.emailservice.model.ProcessingMessage;
+import com.kmarinos.hermes.serviceDto.AttachedFileGET;
 import com.kmarinos.hermes.serviceDto.AttachedFilePOST;
+import com.kmarinos.hermes.serviceDto.EmailInstancePOST;
 import com.kmarinos.hermes.serviceDto.ProgressReport;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class EmailController {
   private final EmailRequestService emailRequestService;
+  private final RecipientService recipientService;
   private final FileService fileService;
   private final AgentService agentService;
 
@@ -35,6 +41,13 @@ public class EmailController {
   @GetMapping("test")
   public String testMe() {
     return "Hello";
+  }
+  @GetMapping("{id}/attachments")
+  public ResponseEntity<List<AttachedFileGET>> getAttachmentsForEmail(@PathVariable("id")String id,@RequestHeader("X-Agent-Token") String agentToken){
+    agentService.getAgentFromToken(agentToken);
+    final var emailRequest = emailRequestService.getEmailRequestById(id);
+    final var attachments =fileService.fetchAttachments(emailRequest);
+    return ResponseEntity.ok(AttachedFileDTO.GET(attachments,fileService::getFileContent));
   }
   @PostMapping("progress")
   public ResponseEntity<Void> reportProgress(@RequestBody Processing progressPOST){
@@ -49,11 +62,27 @@ public class EmailController {
     emailRequestService.registerAttachmentProcessed(attachedFile,pr,agent);
     return ResponseEntity.accepted().build();
   }
+  @PostMapping("sent/{erid}")
+  public ResponseEntity<Void> registerProcessedEmailInstance(@PathVariable("erid")String emailRequestId,@RequestBody
+  ProgressReport<EmailInstancePOST> pr, @RequestHeader("X-Agent-Token") String agentToken){
+    Agent agent=agentService.getAgentFromToken(agentToken);
+    EmailInstance emailInstance = emailRequestService.createEmailInstance(pr.getPayload(),()->recipientService.getByRequestOrCreate(pr.getPayload().getRecipientPOST()));
+    emailRequestService.registerEmailInstanceProcessed(emailInstance,pr,agent);
+    log.info("Email instance registered...");
+    return ResponseEntity.accepted().build();
+  }
   @PostMapping("complete-attachments/{erid}")
   public ResponseEntity<Void>completeAttachments(@PathVariable("erid")String emailRequestId,@RequestHeader("X-Agent-Token") String agentToken){
     Agent agent=agentService.getAgentFromToken(agentToken);
     var emailRequest=emailRequestService.getEmailRequestById(emailRequestId);
     emailRequestService.completeAttachmentProcessing(emailRequest,agent);
+    return ResponseEntity.accepted().build();
+  }
+  @PostMapping("complete-email-instances/{erid}")
+  public ResponseEntity<Void>completeEmailInstances(@PathVariable("erid")String emailRequestId,@RequestHeader("X-Agent-Token") String agentToken){
+    Agent agent=agentService.getAgentFromToken(agentToken);
+    var emailRequest=emailRequestService.getEmailRequestById(emailRequestId);
+    emailRequestService.completeEmailInstanceProcessing(emailRequest,agent);
     return ResponseEntity.accepted().build();
   }
 
