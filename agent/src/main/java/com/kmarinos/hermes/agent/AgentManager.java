@@ -32,7 +32,7 @@ public class AgentManager {
 
   @Scheduled(cron = "0/2 * * * * *")
   public void heartbeat() {
-    log.info("Sending heartbeat");
+//    log.info("Sending heartbeat");
     try {
       var heartbeat = sendHeartbeat();
       if (heartbeat == null || heartbeat.getStatus().equals(HeartbeatStatus.UNKNOWN_AGENT)) {
@@ -56,6 +56,7 @@ public class AgentManager {
         .build();
     assert backendClient.registerAgent(agentPost) != null;
     activeAgent.setId(backendClient.registerAgent(agentPost).getId());
+    activeAgent.setFriendlyName(friendlyName);
     log.info("registered agent {} with id {}", activeAgent.getFriendlyName(), activeAgent.getId());
   }
 

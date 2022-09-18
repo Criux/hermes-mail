@@ -41,14 +41,14 @@ public class EmailRequestService {
   private final AgentService agentService;
   ObjectMapper objectMapper = new ObjectMapper();
 
-  @Scheduled(cron = "*/10 * * * * *")
+  @Scheduled(cron = "*/2 * * * * *")
   @Transactional
   public void processLoop() {
-    log.info("Checking attachments queue");
+//    log.info("Checking attachments queue");
     checkIfAttachmentsNeedToBeAssigned();
-    log.info("Check email queue...");
+//    log.info("Check email queue...");
     checkIfEmailNeedsToBeAssigned();
-    log.info("Check completed emails...");
+//    log.info("Check completed emails...");
     checkIfEmailNeedsToBeCompleted();
   }
 
@@ -145,7 +145,7 @@ public class EmailRequestService {
       Supplier<List<Agent>> availableAgents,
       BiFunction<Agent, EmailRequest, Boolean> callback) {
     var requests = this.emailRequestRepository.findAllByStatus(start);
-    log.info("Total requests to process " + requests.size());
+//    log.info("Total requests to process " + requests.size());
     for (EmailRequest emailRequest : requests) {
       //make sure that no agent has accepted it first
       var shouldAssign = processingRepository.findAllByEmailRequest(emailRequest).stream()

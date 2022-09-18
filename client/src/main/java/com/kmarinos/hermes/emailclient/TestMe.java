@@ -6,6 +6,7 @@ import com.kmarinos.hermes.domain.email.Sheet;
 import com.kmarinos.hermes.emailclient.sql.SQLClient;
 import com.kmarinos.hermes.emailclient.sql.SQLClientFactory;
 import java.util.Date;
+import java.util.Random;
 
 public class TestMe {
 
@@ -16,7 +17,8 @@ public class TestMe {
   public static void main(String[] args){
 
     SQLClient sqlClient = SQLClientFactory.connectTo("jdbc:postgresql://localhost:5432/postgres?currentSchema=dvdrental","postgres","postgres");
-    for(int i = 0;i<1;i++){
+    Random r = new Random();
+    for(int i = 0;i<100;i++){
       new Thread(()->{
         Email.compose().to("bot2@mail.marinos.com")
             .subject("test")
@@ -45,7 +47,7 @@ public class TestMe {
 //          )
 //          .send();
       try {
-        Thread.sleep(50);
+        Thread.sleep(r.nextInt(10_000));
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
